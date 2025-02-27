@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subscription, Telegram & Payment Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-color: #bb86fc;
+      --secondary-color: #3700b3;
+      --highlight-color: #03dac6;
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #e0e0e0;
+      --accent: #03dac6;
+      --subtext-color: #b0b0b0;
+      --shadow: rgba(0, 0, 0, 0.6);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      padding: 80px 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+    header p {
+      font-size: 1.25rem;
+      color: var(--subtext-color);
+    }
+    /* Only one section visible at a time */
+    .section { display: none; }
+    .active { display: block; }
+    
+    /* Subscription Cards */
+    .pricing-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 40px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      box-shadow: 0 10px 20px var(--shadow);
+      padding: 30px;
+      width: 320px;
+      transition: transform 0.3s ease;
+      text-align: center;
+      cursor: pointer;
+    }
+    .card:hover { transform: translateY(-10px); }
+    .card h2 { margin-bottom: 10px; font-size: 1.75rem; }
+    .price {
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 20px 0;
+    }
+    .features {
+      list-style: none;
+      margin-bottom: 20px;
+      padding: 0;
+      text-align: left;
+    }
+    .features li {
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+      color: var(--subtext-color);
+    }
+    .features li:last-child { border-bottom: none; }
+    .btn {
+      display: block;
+      width: 80%;
+      margin: 20px auto;
+      text-align: center;
+      background: var(--primary-color);
+      color: var(--bg-color);
+      padding: 12px 0;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .btn:hover { background: var(--secondary-color); }
+    .highlight {
+      background: var(--highlight-color);
+      color: var(--bg-color);
+    }
+    .highlight h2,
+    .highlight .price { color: var(--bg-color); }
+    .highlight .features li { color: var(--bg-color); }
+    .highlight .btn {
+      background: var(--bg-color);
+      color: var(--highlight-color);
+    }
+    .highlight .btn:hover { background: #e0e0e0; }
+    
+    /* Username Section */
+    .username-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+    .username-container {
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+      width: 400px;
+      text-align: center;
+    }
+    .username-container input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin: 20px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    .success {
+      display: none;
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+    
+    /* Payment Options Section */
+    .payment-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+    .payment-container {
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+      width: 400px;
+      text-align: center;
+    }
+    .payment-container p {
+      margin-bottom: 20px;
+    }
+    .payment-options button {
+      margin: 10px;
+      padding: 12px 20px;
+      background: var(--primary-color);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .payment-options button:hover {
+      background: var(--secondary-color);
+    }
+    
+    /* Individual Payment Simulation Sections (BTC/ETH) */
+    .individual-payment {
+      text-align: center;
+      max-width: 600px;
+      margin: 50px auto;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px var(--shadow);
+    }
+    .wallet {
+      margin-bottom: 20px;
+    }
+    .wallet p {
+      background: var(--bg-color);
+      padding: 10px;
+      font-family: monospace;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    .payment-status {
+      margin-top: 20px;
+    }
+    .payment-status .status {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+    
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #1a1a1a;
+      color: var(--subtext-color);
+      margin-top: 40px;
+    }
+    @media (max-width: 768px) {
+      .pricing-section { flex-direction: column; align-items: center; }
+    }
+    
+    /* Onboarding Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+    }
+    .modal-content {
+      background-color: #1e1e1e;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 10px;
+      color: #e0e0e0;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover, .close:focus {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Info Icon for Onboarding (always available) -->
+  <div id="infoIcon" onclick="openOnboarding()" style="position: fixed; top: 10px; right: 10px; cursor: pointer; z-index: 200;">
+    <img src="https://img.icons8.com/ios-glyphs/30/ffffff/info.png" alt="Info" />
+  </div>
+  
+  <!-- Onboarding Modal -->
+  <div id="onboardingModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeOnboarding()">&times;</span>
+      <h2>Payment Instructions</h2>
+      <ul>
+        <li>Copy the wallet address and send the subscription amount to that address.</li>
+        <li>Once you have sent the payment, click on "<strong>Payment BTC Sent</strong>" or "<strong>Payment ETH Sent</strong>" (depending on your selection).</li>
+        <li>Wait for the incoming payment.</li>
+        <li>Check your transaction via <strong>Payment Progress</strong>.</li>
+        <li>Once the process is complete, you will receive a confirmation on this page.</li>
+        <li>Then, a personal invitation link will be sent to your specified Telegram account.</li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- Header (Subscription Selection) -->
+  <header>
+    <div class="container">
+      <h1>DelusionIPTV</h1>
+      <p>Choose Your Plan – one-time payment or subscription options</p>
+    </div>
+  </header>
+  
+  <div class="container">
+    <!-- Section 1: Subscription Selection -->
+    <section id="subscriptionSection" class="section active">
+      <div class="pricing-section">
+        <!-- 1 Month Plan -->
+        <div class="card" onclick="goToUsername()">
+          <h2>1 Month</h2>
+          <p class="price">€30</p>
+          <ul class="features">
+            <li>Access to the Platform</li>
+            <li>Support</li>
+          </ul>
+          <div class="btn">Select Plan</div>
+        </div>
+        <!-- Lifetime Plan (Highlighted) -->
+        <div class="card highlight" onclick="goToUsername()">
+          <h2>LIFETIME</h2>
+          <p class="price">€100</p>
+          <ul class="features">
+            <li>Access to the Platform</li>
+            <li>24/7 Support</li>
+            <li>Access to Video Collection</li>
+            <li>Access to Exclusive Content</li>
+            <li>Monthly Specific Scan</li>
+          </ul>
+          <div class="btn">Select Plan</div>
+        </div>
+        <!-- 6 Month Plan -->
+        <div class="card" onclick="goToUsername()">
+          <h2>6 Months</h2>
+          <p class="price">€50</p>
+          <ul class="features">
+            <li>Access to the Platform</li>
+            <li>24/7 Support</li>
+            <li>Access to Video Collection</li>
+          </ul>
+          <div class="btn">Select Plan</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Section 2: Telegram Username Confirmation -->
+    <section id="usernameSection" class="section">
+      <div class="username-section">
+        <div class="username-container">
+          <h2>Enter Your Telegram Username</h2>
+          <p>Please enter your Telegram username (e.g., @username)</p>
+          <input type="text" id="telegramUsername" placeholder="@username" />
+          <div class="btn" onclick="confirmUsername()">Confirm</div>
+          <div class="success" id="successMessage">
+            Success! Redirecting to payment options...
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Section 3: Payment Options -->
+    <section id="paymentOptionsSection" class="section">
+      <div class="payment-section">
+        <div class="payment-container">
+          <h2>Payment Options</h2>
+          <p>Please choose your payment method:</p>
+          <div class="payment-options">
+            <button onclick="goToBTCPayment()">Pay with BTC</button>
+            <button onclick="goToETHPayment()">Pay with ETH</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Section 4: BTC Payment Simulation -->
+    <section id="btcPaymentSection" class="section">
+      <div class="individual-payment">
+        <h1>BTC Payment</h1>
+        <div class="wallet">
+          <h3>BTC Wallet Address</h3>
+          <p id="btcAddress">1TestBTCAddress1234567890abcdef</p>
+          <button class="btn" onclick="copyAddress('btcAddress')">Copy Address</button>
+        </div>
+        <div class="payment-status">
+          <p id="btcStatus" class="status"></p>
+          <button class="btn" id="simulateBTCBtn" onclick="simulateBTCPayment()">Payment BTC Sent</button>
+          <button class="btn" id="btcProgressBtn" onclick="simulateBTCProgress()" disabled>Payment Progress</button>
+        </div>
+        <div class="btn" onclick="goToPaymentOptions()">Back to Payment Options</div>
+      </div>
+    </section>
+    
+    <!-- Section 5: ETH Payment Simulation -->
+    <section id="ethPaymentSection" class="section">
+      <div class="individual-payment">
+        <h1>ETH Payment</h1>
+        <div class="wallet">
+          <h3>ETH Wallet Address</h3>
+          <p id="ethAddress">0xTestETHAddress1234567890abcdef</p>
+          <button class="btn" onclick="copyAddress('ethAddress')">Copy Address</button>
+        </div>
+        <div class="payment-status">
+          <p id="ethStatus" class="status"></p>
+          <button class="btn" id="simulateETHBtn" onclick="simulateETHPayment()">Payment ETH Sent</button>
+          <button class="btn" id="ethProgressBtn" onclick="simulateETHProgress()" disabled>Payment Progress</button>
+        </div>
+        <div class="btn" onclick="goToPaymentOptions()">Back to Payment Options</div>
+      </div>
+    </section>
+  </div>
+  
+  <footer>
+    <div class="container">
+      <p>© 2025 Your Company. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <script>
+    // Onboarding modal functions (always trigger on payment pages)
+    function openOnboarding() {
+      document.getElementById('onboardingModal').style.display = "block";
+    }
+    function closeOnboarding() {
+      document.getElementById('onboardingModal').style.display = "none";
+    }
+    
+    // Navigation functions
+    function goToUsername() {
+      document.getElementById('subscriptionSection').classList.remove('active');
+      document.getElementById('usernameSection').classList.add('active');
+    }
+    function confirmUsername() {
+      var username = document.getElementById("telegramUsername").value;
+      if (username.trim() === "" || !username.startsWith("@")) {
+        alert("Please enter a valid Telegram username starting with '@'.");
+        return;
+      }
+      document.getElementById("successMessage").style.display = "block";
+      setTimeout(function() {
+        document.getElementById('usernameSection').classList.remove('active');
+        document.getElementById('paymentOptionsSection').classList.add('active');
+      }, 2000);
+    }
+    function goToPaymentOptions() {
+      document.getElementById('btcPaymentSection').classList.remove('active');
+      document.getElementById('ethPaymentSection').classList.remove('active');
+      document.getElementById('paymentOptionsSection').classList.add('active');
+    }
+    function goToBTCPayment() {
+      document.getElementById('paymentOptionsSection').classList.remove('active');
+      document.getElementById('btcPaymentSection').classList.add('active');
+      document.getElementById("btcStatus").innerText = "";
+      document.getElementById("simulateBTCBtn").disabled = false;
+      document.getElementById("simulateBTCBtn").innerText = "Payment BTC Sent";
+      document.getElementById("btcProgressBtn").disabled = true;
+      openOnboarding();
+    }
+    function goToETHPayment() {
+      document.getElementById('paymentOptionsSection').classList.remove('active');
+      document.getElementById('ethPaymentSection').classList.add('active');
+      document.getElementById("ethStatus").innerText = "";
+      document.getElementById("simulateETHBtn").disabled = false;
+      document.getElementById("simulateETHBtn").innerText = "Payment ETH Sent";
+      document.getElementById("ethProgressBtn").disabled = true;
+      openOnboarding();
+    }
+    
+    // Copy address function
+    function copyAddress(elementId) {
+      const address = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(address).then(() => {
+        alert("Address copied to clipboard!");
+      }, () => {
+        alert("Failed to copy address.");
+      });
+    }
+    
+    // BTC Payment simulation functions
+    function simulateBTCPayment() {
+      document.getElementById("simulateBTCBtn").disabled = true;
+      var statusText = document.getElementById("btcStatus");
+      var dots = 0;
+      statusText.innerText = "Payment pending";
+      var interval = setInterval(function() {
+         dots = (dots + 1) % 4;
+         statusText.innerText = "Payment pending" + ".".repeat(dots);
+      }, 500);
+      setTimeout(function() {
+         clearInterval(interval);
+         statusText.innerText = "Payment sended";
+         document.getElementById("btcProgressBtn").disabled = false;
+      }, 10000);
+    }
+    function simulateBTCProgress() {
+      document.getElementById("btcProgressBtn").disabled = true;
+      var statusText = document.getElementById("btcStatus");
+      var dots = 0;
+      statusText.innerText = "Payment progression";
+      var interval = setInterval(function() {
+         dots = (dots + 1) % 4;
+         statusText.innerText = "Payment progression" + ".".repeat(dots);
+      }, 500);
+      setTimeout(function() {
+         clearInterval(interval);
+         statusText.innerText = "Payment progression complete";
+      }, 10000);
+    }
+    
+    // ETH Payment simulation functions
+    function simulateETHPayment() {
+      document.getElementById("simulateETHBtn").disabled = true;
+      var statusText = document.getElementById("ethStatus");
+      var dots = 0;
+      statusText.innerText = "Payment pending";
+      var interval = setInterval(function() {
+         dots = (dots + 1) % 4;
+         statusText.innerText = "Payment pending" + ".".repeat(dots);
+      }, 500);
+      setTimeout(function() {
+         clearInterval(interval);
+         statusText.innerText = "Payment sended";
+         document.getElementById("ethProgressBtn").disabled = false;
+      }, 10000);
+    }
+    function simulateETHProgress() {
+      document.getElementById("ethProgressBtn").disabled = true;
+      var statusText = document.getElementById("ethStatus");
+      var dots = 0;
+      statusText.innerText = "Payment progression";
+      var interval = setInterval(function() {
+         dots = (dots + 1) % 4;
+         statusText.innerText = "Payment progression" + ".".repeat(dots);
+      }, 500);
+      setTimeout(function() {
+         clearInterval(interval);
+         statusText.innerText = "Payment progression complete";
+      }, 10000);
+    }
+  </script>
+</body>
+</html>
